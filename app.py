@@ -24,7 +24,6 @@ HTML = """
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; max-width: 920px; margin: 50px auto; padding: 20px; background: #f7f7f4; color: #1f2933; }
     main { background: white; padding: 32px; border-radius: 18px; border: 1px solid #e5e7eb; }
     h1 { font-size: 34px; margin-bottom: 8px; }
-    p { line-height: 1.5; }
     label { display: block; margin-top: 18px; font-weight: 600; }
     input, textarea, select { width: 100%; padding: 12px; margin-top: 6px; font-size: 16px; border-radius: 10px; border: 1px solid #d1d5db; }
     button { margin-top: 22px; padding: 13px 20px; font-size: 16px; border-radius: 10px; border: 0; background: #111827; color: white; font-weight: 600; cursor: pointer; }
@@ -36,7 +35,7 @@ HTML = """
 <body>
   <main>
     <h1>🎙 Enterprise Meeting Copilot</h1>
-    <p>An AI voice copilot that helps Enterprise Account Executives prepare for executive meetings using live company research and ElevenLabs voice generation.</p>
+    <p>Voice-powered AI copilot for Enterprise Account Executives, built with Gemini Search Grounding and ElevenLabs.</p>
 
     <form method="post">
       <label>Company</label>
@@ -65,7 +64,7 @@ HTML = """
       <audio controls>
         <source src="/audio" type="audio/mpeg">
       </audio>
-      <p class="hint">Briefing generated with Gemini + Google Search grounding and converted to voice with ElevenLabs.</p>
+      <p class="hint">Generated with Gemini + Google Search grounding. Voice by ElevenLabs.</p>
     </div>
     {% endif %}
   </main>
@@ -73,46 +72,36 @@ HTML = """
 </html>
 """
 
-def generate_dynamic_briefing(company, stakeholder, objective):
+def generate_briefing(company, stakeholder, objective):
     prompt = f"""
 You are an Enterprise Account Executive meeting copilot.
 
-Prepare a concise executive briefing for Cristina before a customer meeting.
+Prepare a practical executive briefing for Cristina before a customer meeting.
 
 Company: {company}
 Stakeholder: {stakeholder}
 Meeting objective: {objective}
 
-Use live web research. Look specifically for:
+Use Google Search grounding to find recent and relevant information.
+
+Focus on:
 - recent leadership changes: new CEO, CIO, CTO, CHRO, CFO, CMO
 - AI, digital transformation, automation, cloud, HR, finance or customer experience initiatives
-- budget or investment signals
-- cost-reduction, efficiency, hiring, layoffs, acquisition or expansion signals
-- business priorities that matter to the selected stakeholder
+- budget, investment, efficiency or cost-reduction signals
+- acquisitions, expansion, layoffs, hiring or strategic priorities
+- anything that creates a good business reason to speak with a {stakeholder}
 
 Return the briefing in this structure:
 
 1. What changed recently
-- Bullet points with the most useful recent signals.
-- Mention if there is a new CEO, CIO, CHRO, CFO or other relevant executive.
-- Mention any AI, HR, IT, digital transformation, budget or efficiency initiative.
+2. Why it matters for the {stakeholder}
+3. Buying signals
+4. Suggested opener
+5. Discovery questions
+6. Risks / objections
+7. Recommended next step
 
-2. Why it matters for a {stakeholder}
-- Explain what this stakeholder is likely to care about.
-
-3. Suggested opener
-- Give Cristina a natural opening line for the meeting.
-
-4. Discovery questions
-- Give 4 strong questions tailored to the stakeholder.
-
-5. Risks / objections
-- Mention likely blockers.
-
-6. Recommended next step
-- Give one practical next step to secure after the meeting.
-
-Keep it sharp, useful and under 450 words.
+Keep it concise, useful and sales-oriented.
 """
 
     response = gemini_client.models.generate_content(
@@ -135,7 +124,7 @@ def home():
         stakeholder = request.form.get("stakeholder", "")
         objective = request.form.get("objective", "")
 
-        briefing = generate_dynamic_briefing(company, stakeholder, objective)
+        briefing = generate_briefing(company, stakeholder, objective)
 
         audio = elevenlabs_client.text_to_speech.convert(
             voice_id=VOICE_ID,
