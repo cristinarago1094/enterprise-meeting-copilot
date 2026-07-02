@@ -126,13 +126,16 @@ def home():
 
         briefing = generate_briefing(company, stakeholder, objective)
 
-        audio = elevenlabs_client.text_to_speech.convert(
-            voice_id=VOICE_ID,
-            model_id="eleven_multilingual_v2",
-            text=briefing,
-        )
+       # Limit the text sent to ElevenLabs to avoid exceeding the quota
+voice_summary = briefing[:900]
 
-        latest_audio = b"".join(audio)
+audio = elevenlabs_client.text_to_speech.convert(
+    voice_id=VOICE_ID,
+    model_id="eleven_multilingual_v2",
+    text=voice_summary,
+)
+
+latest_audio = b"".join(audio)
 
     return render_template_string(HTML, briefing=briefing)
 
