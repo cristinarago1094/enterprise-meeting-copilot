@@ -91,17 +91,22 @@ Focus on:
 - acquisitions, expansion, layoffs, hiring or strategic priorities
 - anything that creates a good business reason to speak with a {stakeholder}
 
-Return the briefing in this structure:
+Return two sections:
 
+SCREEN_BRIEF:
+A complete executive briefing for the screen, structured as:
 1. What changed recently
-2. Why it matters for the {stakeholder}
+2. Why it matters for the stakeholder
 3. Buying signals
 4. Suggested opener
 5. Discovery questions
 6. Risks / objections
 7. Recommended next step
 
-Keep it concise, useful and sales-oriented.
+VOICE_BRIEF:
+A short 35-second spoken briefing for Cristina.
+Maximum 120 words.
+Make it sound natural, like a quick prep before walking into the meeting.
 """
 
     response = gemini_client.models.generate_content(
@@ -126,8 +131,10 @@ def home():
 
         briefing = generate_briefing(company, stakeholder, objective)
 
-       # Limit the text sent to ElevenLabs to avoid exceeding the quota
-voice_summary = briefing[:900]
+      if "VOICE_BRIEF:" in briefing:
+    voice_summary = briefing.split("VOICE_BRIEF:", 1)[1].strip()
+else:
+    voice_summary = briefing[:400]
 
 audio = elevenlabs_client.text_to_speech.convert(
     voice_id=VOICE_ID,
