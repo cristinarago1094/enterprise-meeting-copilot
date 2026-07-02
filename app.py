@@ -77,7 +77,7 @@ def home():
         briefing = generate_briefing(meeting)
 
         audio = client.text_to_speech.convert(
-            voice_id="21m00Tcm4TlvDq8ikWAM",
+            voice_id="HKSyJ8Hw3U0MRVcY90xW",
             model_id="eleven_multilingual_v2",
             text=briefing,
         )
